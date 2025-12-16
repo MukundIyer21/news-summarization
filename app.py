@@ -12,3 +12,4 @@ if st.button("Generate Summary"):
             {"topic": topic, "timeframe": timeframe}
         )
         st.markdown(result["final_output"])
+        st.success(f"Saved as {result['file_path']}")
