@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph
 from typing import TypedDict
-from nodes import fetch_news, summarize_news, save_result
-from state import NewsState
+from nodes.nodes import fetch_news, summarize_news, save_result
+from state.state import NewsState
 graph = StateGraph(NewsState)
 
 graph.add_node("fetch_news", fetch_news)

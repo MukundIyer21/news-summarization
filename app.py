@@ -1,5 +1,5 @@
 import streamlit as st
-from graph import news_graph
+from graphs.graph import news_graph
 
 st.title("AI News Summarizer")
 
