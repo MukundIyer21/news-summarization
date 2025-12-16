@@ -1,34 +1,32 @@
-from tools import tavily
+from tools.tools import tavily
 from llms.llm import llm
 import os
 
 def fetch_news(state):
     topic = state["topic"]
-    frequency = state["timeframe"].lower()
+    timeframe = state["timeframe"]
 
-    time_range_map = {"daily": "d", "weekly": "w", "monthly": "m"}
-    days_map = {"daily": 1, "weekly": 7, "monthly": 30}
+    query_map = {
+        "daily": f"{topic} news today",
+        "weekly": f"{topic} news this week",
+        "monthly": f"{topic} news this month"
+    }
 
-    response = tavily.search(
-        query=f"Top {topic} news India and globally",
-        topic="news",
-        time_range=time_range_map[frequency],
-        include_answer="advanced",
-        max_results=10,
-        days=days_map[frequency]
+    results = tavily.invoke(query_map[timeframe])
+
+    raw_text = " ".join(
+        r.get("content", "") for r in results
     )
 
-    articles = response.get("results", [])
-    raw_text = " ".join(a.get("content", "") for a in articles)
-
     return {
-        "news_data": articles,
+        "news_data": results,
         "raw_news": raw_text
     }
 
 def summarize_news(state):
-    prompt = f"You are a professional news summarizer, summarize the following news clearly:\n{state['raw_news']}"
-    summary = llm.invoke(prompt).content
+    summary = llm.invoke(
+        f"Summarize the following news clearly:\n{state['raw_news']}"
+    ).content
     return {"summary": summary}
 
 def save_result(state):
@@ -38,12 +36,12 @@ def save_result(state):
 
     markdown = f"""# {state['topic'].title()} News Summary
 
-                ## Timeframe
-                {state['timeframe'].title()}
+## Timeframe
+{state['timeframe'].title()}
 
-                ## Summary
-                {state['summary']}
-                """
+## Summary
+{state['summary']}
+"""
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(markdown)
