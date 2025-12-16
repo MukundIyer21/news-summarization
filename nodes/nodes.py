@@ -13,10 +13,10 @@ def summarize_news(state):
     return {"summary": summary}
 
 def save_result(state):
-    markdown = f"""## {state['topic'].title()} News Summary
+    markdown = f"""## {state['topic']} News Summary
 
 ### Timeframe
-{state['timeframe'].title()}
+{state['timeframe']}
 
 ### Summary
 {state['summary']}
