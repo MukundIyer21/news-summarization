@@ -1,26 +1,28 @@
 from tools.tools import tavily
 from llms.llm import llm
 import os
-
 def fetch_news(state):
     topic = state["topic"]
-    timeframe = state["timeframe"]
+    frequency = state["timeframe"].lower()
 
-    query_map = {
-        "daily": f"{topic} news today",
-        "weekly": f"{topic} news this week",
-        "monthly": f"{topic} news this month"
-    }
+    time_range_map = {"daily": "d", "weekly": "w", "monthly": "m"}
+    days_map = {"daily": 1, "weekly": 7, "monthly": 30}
 
-    results = tavily.invoke(query_map[timeframe])
-
-    raw_text = " ".join(
-        r.get("content", "") for r in results
+    response = tavily.search(
+        query=f"Top {topic} news India and globally",
+        topic="news",
+        time_range=time_range_map[frequency],
+        include_answer="advanced",
+        max_results=20,
+        days=days_map[frequency]
     )
 
+    articles = response.get("results", [])
+    raw_news = " ".join(a.get("content", "") for a in articles)
+
     return {
-        "news_data": results,
-        "raw_news": raw_text
+        "news_data": articles,
+        "raw_news": raw_news
     }
 
 def summarize_news(state):
