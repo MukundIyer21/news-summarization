@@ -1,25 +1,14 @@
 import streamlit as st
-from graph import build_graph
-from langchain.schema import HumanMessage
+from graph import news_graph
 
-st.set_page_config(page_title="Agentic News Summarizer", layout="centered")
+st.title("AI News Summarizer")
 
-st.title("Agentic News Summarizer")
-st.write("Enter a topic to get a concise news summary.")
+topic = st.text_input("News Topic")
+timeframe = st.selectbox("Timeframe", ["daily", "weekly", "monthly"])
 
-app = build_graph()
-
-topic = st.text_input("Topic")
-
-if st.button("Summarize") and topic:
-    with st.spinner("Searching and summarizing..."):
-        result = app.invoke({
-            "messages": [
-                HumanMessage(
-                    content=f"Find recent news about {topic} and summarize it."
-                )
-            ]
-        })
-
-    st.subheader("Summary")
-    st.write(result["messages"][-1].content)
+if st.button("Generate Summary"):
+    if topic:
+        result = news_graph.invoke(
+            {"topic": topic, "timeframe": timeframe}
+        )
+        st.markdown(result["final_output"])
